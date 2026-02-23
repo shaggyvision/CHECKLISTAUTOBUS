@@ -146,6 +146,11 @@
   </main>
 <script>
 (function(){
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  // EDITA ESTA URL con la de tu backend (Render/Vercel/Railway/Azure)
+  const API_BASE = 'https://TU-BACKEND.example.com'; // <-- CAMBIA ESTO
+  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
   async function ensureJsPDF(){
     if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
     await new Promise((resolve, reject)=>{
@@ -245,8 +250,11 @@
     formData.append('to', emailDestino);
     formData.append('subject', `Inventario Unidad Toreto – ${filename}`);
     formData.append('body', `Hola,\n\nAdjunto el PDF "${filename}" generado desde la app web.\n\nSaludos.`);
-
-    const resp = await fetch('/api/send-email', { method: 'POST', body: formData });
+    // 🔁 URL absoluta al backend
+    const resp = await fetch(`${API_BASE}/api/send-email`, {
+      method: 'POST',
+      body: formData
+    });
     if (!resp.ok) {
       const txt = await resp.text().catch(()=> '');
       throw new Error(`Error al enviar correo (${resp.status}). ${txt}`);
