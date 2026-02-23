@@ -220,7 +220,7 @@
  fileToDataURL(document.querySelector('input[name="foto4"]').files[0]) 
  ]); 
  // Cargar firma de Recibe desde URL fija
- const sigRecibeURL = 'https://shaggyvision.github.io/CHECKLISTAUTOBUS/FIRMA.PNG'; 
+ const sigRecibeURL = 'https://shaggyvision.github.io/CHECKLISTAUTOBUS/FIRMA-removebg-preview.png'; 
  let sigRecibeDataURL = null; 
  try { sigRecibeDataURL = await fetchImageAsDataURL(sigRecibeURL); } catch(e) { console.warn('No se pudo cargar la firma de Recibe', e);} 
  const doc=new jsPDF({unit:'pt',format:'a4'}); 
