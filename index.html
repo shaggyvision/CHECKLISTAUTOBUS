@@ -34,7 +34,6 @@
     .photo-item{display:grid; grid-template-columns:140px 1fr; gap:12px; align-items:center; border:1px solid #e5e7eb; border-radius:10px; padding:10px}
     .photo-item img.bus{width:130px; height:auto; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,.08)}
   </style>
-  <!-- Carga principal de jsPDF; si falla, el script hace fallback a otro CDN -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -93,28 +92,28 @@
         <legend>Fotos (con guía real)</legend>
         <div class="photo-grid">
           <div class="photo-item">
-            <img class="bus" src="bus_0.png" alt="Lado Izquierdo"/>
+            <img class="bus" src="IZQUIERDA.png" alt="Lado Izquierdo"/>
             <div>
               <label>Foto 1 – Lado Izquierdo</label>
               <input type="file" accept="image/*" name="foto1">
             </div>
           </div>
           <div class="photo-item">
-            <img class="bus" src="bus_1.png" alt="Lado Derecho"/>
+            <img class="bus" src="DERECHA.png" alt="Lado Derecho"/>
             <div>
               <label>Foto 2 – Lado Derecho</label>
               <input type="file" accept="image/*" name="foto2">
             </div>
           </div>
           <div class="photo-item">
-            <img class="bus" src="bus_2.png" alt="Frente"/>
+            <img class="bus" src="FRENTE.png" alt="Frente"/>
             <div>
               <label>Foto 3 – Frente</label>
               <input type="file" accept="image/*" name="foto3">
             </div>
           </div>
           <div class="photo-item">
-            <img class="bus" src="bus_3.png" alt="Atrás"/>
+            <img class="bus" src="ATRAS.png" alt="Atrás"/>
             <div>
               <label>Foto 4 – Atrás</label>
               <input type="file" accept="image/*" name="foto4">
@@ -155,7 +154,6 @@
 
 <script>
 (function(){
-  // Fallback si el CDN principal falla
   async function ensureJsPDF(){
     if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
     await new Promise((resolve, reject)=>{
@@ -223,7 +221,8 @@
     ]);
 
     const doc=new jsPDF({unit:'pt',format:'a4'});const W=doc.internal.pageSize.getWidth();const M=36;let y=M;
-    // Logo si existe en la página: tomamos el <img> del header
+
+    // Logo si existe
     const logoImg = document.querySelector('header img');
     if (logoImg && logoImg.complete) {
       try {
@@ -232,7 +231,7 @@
         const ctx = canvas.getContext('2d'); ctx.drawImage(logoImg,0,0);
         const logoData = canvas.toDataURL('image/png');
         doc.addImage(logoData,'PNG',M,y-10,80,28);
-      } catch(e) { /* si falla, seguimos */ }
+      } catch(e) {}
     }
 
     doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text('INVENTARIO DIARIO DE UNIDAD TORETO', W/2, y, {align:'center'});y+=20;
@@ -260,7 +259,7 @@
   }
 
   function downloadBlob(blob, filename){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
-  function openShare(data, filename){const texto=encodeURIComponent(`Inventario de Unidad Toreto\nEmpleado: ${data.empleado}\nFecha: ${data.fecha}\nUnidad: ${data.unidad||'-'}\n*Se adjunta el PDF (${filename}).*`);window.open(`https://wa.me/${WHATSAPP_DEST}?text=${texto}`,'_blank');const subject=encodeURIComponent(`Inventario Unidad Toreto – ${data.empleado} – ${data.fecha}`);const body=encodeURIComponent(`Hola,\n\nSe adjunta el PDF \"${filename}\" del inventario.\n\n(Nota: si no se adjuntó automáticamente, por favor adjúntalo al correo que se descargó)\n\nGracias.`);window.location.href=`mailto:${EMAIL_DEST}?subject=${subject}&body=${body}`;}
+  function openShare(data, filename){const texto=encodeURIComponent(`Inventario de Unidad Toreto\nEmpleado: ${data.empleado}\nFecha: ${data.fecha}\nUnidad: ${data.unidad||'-'}\n*Se adjunta el PDF (${filename}).*`);window.open(`https://wa.me/529935132288?text=${texto}`,'_blank');const subject=encodeURIComponent(`Inventario Unidad Toreto – ${data.empleado} – ${data.fecha}`);const body=encodeURIComponent(`Hola,\n\nSe adjunta el PDF \"${filename}\" del inventario.\n\n(Nota: si no se adjuntó automáticamente, por favor adjúntalo al correo que se descargó)\n\nGracias.`);window.location.href=`mailto:j.a.l.h@outlook.com?subject=${subject}&body=${body}`;}
 
   document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('fecha').value = new Date().toISOString().slice(0,10);
