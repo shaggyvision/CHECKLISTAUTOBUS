@@ -45,17 +45,30 @@
       <fieldset>
         <legend>Datos generales</legend>
         <div class="grid g3">
-          <div><label>Fecha</label><input type="date" id="fecha" name="fecha" required></div>
-          <div><label>Unidad</label><input type="text" name="unidad" placeholder="Ej. 1234 o placas"></div>
-          <div><label>Ciudad</label><input type="text" name="ciudad" placeholder="Ciudad"></div>
-          <div><label>Terminal</label>
-            <select name="terminal"><option value="">Seleccione…</option><option>Cárdenas</option><option>Taller</option><option>Cata</option><option>Adolfo/Herr/Sosa</option></select>
+          <div>
+            <label>Fecha</label>
+            <input type="date" id="fecha" name="fecha" required readonly>
           </div>
-          <div><label>Lugar de estancia</label><input type="text" name="lugar" placeholder="Ej. Patio, Base, Taller"></div>
           <div>
             <label>Clave de empleado (7 dígitos)</label>
             <input type="text" id="empleado" name="empleado" inputmode="numeric" maxlength="7" pattern="\d{7}" required placeholder="0000000">
             <div id="empleadoHelp" class="help"></div>
+          </div>
+          <div>
+            <label>Unidad</label>
+            <input type="text" name="unidad" placeholder="Ej. 1234 o placas">
+          </div>
+          <div>
+            <label>Ciudad</label>
+            <input type="text" name="ciudad" id="ciudad" value="VILLAHERMOSA, TABASCO" readonly>
+          </div>
+          <div>
+            <label>Terminal</label>
+            <select name="terminal"><option value="">Seleccione…</option><option>Cárdenas</option><option>Taller</option><option>Cata</option><option>Adolfo/Herr/Sosa</option></select>
+          </div>
+          <div>
+            <label>Lugar de estancia</label>
+            <input type="text" name="lugar" placeholder="Ej. Patio, Base, Taller">
           </div>
         </div>
       </fieldset>
@@ -174,9 +187,8 @@
   function downloadBlob(blob, filename){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
   function openShare(data, filename){const texto=encodeURIComponent(`Inventario de Unidad Toreto\nEmpleado: ${data.empleado}\nFecha: ${data.fecha}\nUnidad: ${data.unidad||'-'}\n*Se adjunta el PDF (${filename}).*`);window.open(`https://wa.me/${WHATSAPP_DEST}?text=${texto}`,'_blank');const subject=encodeURIComponent(`Inventario Unidad Toreto – ${data.empleado} – ${data.fecha}`);const body=encodeURIComponent(`Hola,\n\nSe adjunta el PDF \"${filename}\" del inventario.\n\n(Nota: si no se adjuntó automáticamente, por favor adjúntalo al correo que se descargó)\n\nGracias.`);window.location.href=`mailto:${EMAIL_DEST}?subject=${subject}&body=${body}`;}
   async function sendViaBackend(base64, filename, meta){const res=await fetch(`${BACKEND_URL}/send`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pdfBase64:base64, filename, employeeId:meta.empleado, whatsappTo:WHATSAPP_DEST, emailTo:EMAIL_DEST})});if(!res.ok){throw new Error('Error al enviar');}return await res.json();}
+  // FECHA del día al cargar
   document.getElementById('fecha').value = new Date().toISOString().slice(0,10);
-  document.getElementById('btnPDF').addEventListener('click', async()=>{const st=document.getElementById('status');st.textContent='Generando PDF…';try{const { blob, filename }=await generarPDF();downloadBlob(blob, filename);st.textContent=`PDF generado: ${filename}`;}catch(e){st.textContent=e.message;}});
-  document.getElementById('btnEnviar').addEventListener('click', async()=>{const st=document.getElementById('status');st.textContent='Generando PDF…';try{const { blob, base64, filename, data }=await generarPDF();downloadBlob(blob, filename);if(BACKEND_URL){await sendViaBackend(base64, filename, data);st.textContent='Enviado automáticamente por WhatsApp y correo.';}else{openShare(data, filename);st.textContent='Se abrió WhatsApp/correo. Adjunta el PDF descargado.';}}catch(e){st.textContent=e.message;}});
 })();
 </script>
 </body>
