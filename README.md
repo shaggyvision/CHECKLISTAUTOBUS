@@ -1,24 +1,35 @@
-# Inventario Toreto (con logo ADO)
+# Inventario Toreto – Envío automático por correo
 
-Front-end HTML que genera PDF y abre WhatsApp/correo. Backend opcional para envío automático.
+Este proyecto sirve tu `index.html` y expone un endpoint `/api/send-email` para **adjuntar y enviar** el PDF generado a `j.a.l.h@outlook.com`.
 
-## Estructura
-```
-/ (raíz)
-├── index.html
-├── logo.png
-└── backend/
-    ├── package.json
-    ├── server.js
-    └── .env.example
+## Requisitos
+- Node.js 18+
+
+## Instalación
+```bash
+npm install
 ```
 
-## Uso rápido
-1. Abre `index.html` en tu navegador.
-2. Captura el checklist, genera y descarga el PDF. El botón **Enviar** abre WhatsApp/correo (adjunta el PDF descargado).
+## Configuración
+Copia `.env.example` a `.env` y completa tus credenciales SMTP:
+```bash
+cp .env.example .env
+# edita .env y coloca SMTP_USER/SMTP_PASS, etc.
+```
 
-## Backend opcional
-1. `cd backend && npm install`
-2. Copia `.env.example` a `.env` y rellena credenciales.
-3. `npm start`
-4. En `index.html` asigna `const BACKEND_URL = "http://localhost:3000"` para envío automático.
+> Para Outlook/Office 365 suele funcionar `SMTP_HOST=smtp.office365.com` y `SMTP_PORT=587` con STARTTLS.
+
+## Ejecutar
+```bash
+npm start
+```
+Abre: <http://localhost:3000>
+
+## Flujo de uso
+1. Llena el formulario.
+2. Presiona **Generar PDF**.
+3. Se descargará el PDF **y** se enviará automáticamente al correo configurado.
+
+## Notas
+- Si sirves `index.html` desde este mismo servidor, no necesitas CORS.
+- Revisa la consola del servidor por errores de autenticación SMTP.
