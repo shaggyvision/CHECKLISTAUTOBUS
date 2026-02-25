@@ -1,302 +1,661 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Inventario Diario de Unidad Toreto</title>
-  <style>
-    :root{ --c1:#0d47a1; --bg:#f5f7fb; }
-    *{box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0; background:var(--bg); color:#222}
-    header{background:#fff; padding:10px 16px; border-bottom:1px solid #e9eef4; display:flex; align-items:center; gap:12px}
-    header img{height:34px}
-    header .t{font-weight:700; color:#0d47a1}
-    main{max-width:1000px; margin:20px auto; background:#fff; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.08); overflow:hidden}
-    form{padding:20px}
-    fieldset{border:1px solid #e5e7eb; padding:16px; border-radius:10px; margin-bottom:16px}
-    legend{font-weight:700; color:#0d47a1; padding:0 6px}
-    .grid{display:grid; gap:12px}
-    .g2{grid-template-columns:repeat(2,1fr)}
-    .g3{grid-template-columns:repeat(3,1fr)}
-    label{font-size:.92rem}
-    input[type="text"], input[type="date"], select, textarea{width:100%; padding:10px 12px; border:1px solid #cfd8dc; border-radius:8px; font-size:.95rem}
-    textarea{min-height:90px; resize:vertical}
-    .tbl{width:100%; border-collapse:collapse; font-size:.92rem}
-    .tbl th,.tbl td{border:1px solid #e5e7eb; padding:8px 10px}
-    .tbl th{background:#f0f4ff; color:#0d47a1; text-align:left}
-    .actions{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
-    button{background:#0d47a1; color:#fff; border:none; padding:12px 16px; border-radius:10px; cursor:pointer; font-weight:600}
-    button.secondary{background:#eceff1; color:#222}
-    .help{font-size:.85rem; color:#607d8b}
-    canvas.sig{border:1px dashed #b0bec5; border-radius:8px; background:#fafafa; touch-action:none}
-    /* Fotos con imagen real del autobús */
-    .photo-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
-    .photo-item{display:grid; grid-template-columns:140px 1fr; gap:12px; align-items:center; border:1px solid #e5e7eb; border-radius:10px; padding:10px}
-    .photo-item img.bus{width:130px; height:auto; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,.08)}
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inventario Diario de Unidad Toreto</title>
+
+<style>
+:root{
+  --c1:#0d47a1;
+  --bg:#f5f7fb;
+}
+*{ box-sizing:border-box }
+body{
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  margin:0;
+  background:var(--bg);
+  color:#222;
+}
+header{
+  background:#fff;
+  padding:10px 16px;
+  border-bottom:1px solid #e9eef4;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+header img{
+  height:34px;
+}
+header .t{
+  font-weight:700;
+  color:#0d47a1;
+}
+main{
+  max-width:1000px;
+  margin:20px auto;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+  overflow:hidden;
+}
+form{
+  padding:20px;
+}
+fieldset{
+  border:1px solid #e5e7eb;
+  padding:16px;
+  border-radius:10px;
+  margin-bottom:16px;
+}
+legend{
+  font-weight:700;
+  color:#0d47a1;
+  padding:0 6px;
+}
+.grid{
+  display:grid;
+  gap:12px;
+}
+.g2{ grid-template-columns:repeat(2,1fr) }
+.g3{ grid-template-columns:repeat(3,1fr) }
+
+label{ font-size:.92rem }
+input[type="text"], input[type="date"], select, textarea{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid #cfd8dc;
+  border-radius:8px;
+  font-size:.95rem;
+}
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+.tbl{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.92rem;
+}
+.tbl th, .tbl td{
+  border:1px solid #e5e7eb;
+  padding:8px 10px;
+}
+.tbl th{
+  background:#f0f4ff;
+  color:#0d47a1;
+  text-align:left;
+}
+
+.actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+button{
+  background:#0d47a1;
+  color:#fff;
+  border:none;
+  padding:12px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+button.secondary{
+  background:#eceff1;
+  color:#222;
+}
+
+.help{
+  font-size:.85rem;
+  color:#607d8b;
+}
+
+canvas.sig{
+  border:1px dashed #b0bec5;
+  border-radius:8px;
+  background:#fafafa;
+  touch-action:none;
+}
+
+/* Fotos */
+.photo-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+.photo-item{
+  display:grid;
+  grid-template-columns:140px 1fr;
+  gap:12px;
+  align-items:center;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  padding:10px;
+}
+.photo-item img.bus{
+  width:130px;
+  height:auto;
+  border-radius:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Logo" onerror="this.style.display='none'"/>
-    <div>
-      <div class="t">Inventario Diario de Unidad Toreto</div>
-      <div class="help">Genera PDF y comparte por WhatsApp / correo</div>
+
+<header>
+  <img src="logo.png" alt="Logo" onerror="this.style.display='none'" />
+  <div>
+    <div class="t">Inventario Diario de Unidad Toreto</div>
+    <div class="help">Genera PDF y comparte por WhatsApp / correo</div>
+  </div>
+</header>
+
+<main>
+<form id="frmInv">
+
+<!-- DATOS GENERALES -->
+<fieldset>
+<legend>Datos generales</legend>
+
+<div class="grid g3">
+  <div>
+    <label>Fecha</label>
+    <input type="date" id="fecha" name="fecha" required readonly>
+  </div>
+
+  <div>
+    <label>Clave de empleado (7 dígitos)</label>
+    <input type="text" id="empleado" name="empleado" inputmode="numeric" maxlength="7" pattern="\\d{7}" required placeholder="0000000">
+    <div id="empleadoHelp" class="help"></div>
+  </div>
+
+  <div>
+    <label>Unidad</label>
+    <input type="text" name="unidad" placeholder="Ej. 1234 o placas">
+  </div>
+
+  <div>
+    <label>Ciudad</label>
+    <input type="text" name="ciudad" id="ciudad" value="VILLAHERMOSA, TABASCO" readonly>
+  </div>
+
+  <div>
+    <label>Terminal</label>
+    <select name="terminal">
+      <option value="">Seleccione…</option>
+      <option>Cárdenas</option>
+      <option>Taller</option>
+      <option>Cata</option>
+      <option>Adolfo/Herr/Sosa</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Lugar de estancia</label>
+    <input type="text" name="lugar" placeholder="Ej. Patio, Base, Taller">
+  </div>
+</div>
+</fieldset>
+
+<!-- INVENTARIOS -->
+<fieldset>
+<legend>Inventario interno</legend>
+<table class="tbl" id="tblInterno"><thead>
+<tr><th>Ítem</th><th>¿Sí?</th><th>¿No?</th></tr>
+</thead><tbody></tbody></table>
+</fieldset>
+
+<fieldset>
+<legend>Inventario externo</legend>
+<table class="tbl" id="tblExterno"><thead>
+<tr><th>Ítem</th><th>¿Sí?</th><th>¿No?</th></tr>
+</thead><tbody></tbody></table>
+</fieldset>
+
+<!-- FOTOS -->
+<fieldset>
+<legend>Fotos</legend>
+<div class="photo-grid">
+
+<div class="photo-item">
+  <img class="bus" src="IZQUIERDA.png" alt="Lado Izquierdo"/>
+  <div>
+    <label>Foto 1 – Lado Izquierdo</label>
+    <input type="file" accept="image/*" name="foto1">
+  </div>
+</div>
+
+<div class="photo-item">
+  <img class="bus" src="DERECHA.png" alt="Lado Derecho"/>
+  <div>
+    <label>Foto 2 – Lado Derecho</label>
+    <input type="file" accept="image/*" name="foto2">
+  </div>
+</div>
+
+<div class="photo-item">
+  <img class="bus" src="FRENTE.png" alt="Frente"/>
+  <div>
+    <label>Foto 3 – Frente</label>
+    <input type="file" accept="image/*" name="foto3">
+  </div>
+</div>
+
+<div class="photo-item">
+  <img class="bus" src="ATRAS.png" alt="Atrás"/>
+  <div>
+    <label>Foto 4 – Atrás</label>
+    <input type="file" accept="image/*" name="foto4">
+  </div>
+</div>
+
+</div>
+</fieldset>
+
+<!-- FIRMAS -->
+<fieldset>
+<legend>Firmas</legend>
+
+<div class="grid g2">
+  <div>
+    <label>Entrega</label>
+    <canvas width="320" height="120" class="sig" id="sigEntrega"></canvas>
+    <div class="actions">
+      <button class="secondary" type="button" data-clear="sigEntrega">Limpiar</button>
     </div>
-  </header>
-  <main>
-    <form id="frmInv">
-      <fieldset>
-        <legend>Datos generales</legend>
-        <div class="grid g3">
-          <div>
-            <label>Fecha</label>
-            <input type="date" id="fecha" name="fecha" required readonly>
-          </div>
-          <div>
-            <label>Clave de empleado (7 dígitos)</label>
-            <input type="text" id="empleado" name="empleado" inputmode="numeric" maxlength="7" pattern="\\d{7}" required placeholder="0000000">
-            <div id="empleadoHelp" class="help"></div>
-          </div>
-          <div>
-            <label>Unidad</label>
-            <input type="text" name="unidad" placeholder="Ej. 1234 o placas">
-          </div>
-          <div>
-            <label>Ciudad</label>
-            <input type="text" name="ciudad" id="ciudad" value="VILLAHERMOSA, TABASCO" readonly>
-          </div>
-          <div>
-            <label>Terminal</label>
-            <select name="terminal"><option value="">Seleccione…</option><option>Cárdenas</option><option>Taller</option><option>Cata</option><option>Adolfo/Herr/Sosa</option></select>
-          </div>
-          <div>
-            <label>Lugar de estancia</label>
-            <input type="text" name="lugar" placeholder="Ej. Patio, Base, Taller">
-          </div>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Inventario interno</legend>
-        <table class="tbl" id="tblInterno"><thead><tr><th>Ítem</th><th>¿Sí?</th><th>¿No?</th></tr></thead><tbody></tbody></table>
-      </fieldset>
-      <fieldset>
-        <legend>Inventario externo</legend>
-        <table class="tbl" id="tblExterno"><thead><tr><th>Ítem</th><th>¿Sí?</th><th>¿No?</th></tr></thead><tbody></tbody></table>
-      </fieldset>
-      <fieldset>
-        <legend>Fotos (con guía real)</legend>
-        <div class="photo-grid">
-          <div class="photo-item">
-            <img class="bus" src="IZQUIERDA.png" alt="Lado Izquierdo"/>
-            <div>
-              <label>Foto 1 – Lado Izquierdo</label>
-              <input type="file" accept="image/*" name="foto1">
-            </div>
-          </div>
-          <div class="photo-item">
-            <img class="bus" src="DERECHA.png" alt="Lado Derecho"/>
-            <div>
-              <label>Foto 2 – Lado Derecho</label>
-              <input type="file" accept="image/*" name="foto2">
-            </div>
-          </div>
-          <div class="photo-item">
-            <img class="bus" src="FRENTE.png" alt="Frente"/>
-            <div>
-              <label>Foto 3 – Frente</label>
-              <input type="file" accept="image/*" name="foto3">
-            </div>
-          </div>
-          <div class="photo-item">
-            <img class="bus" src="ATRAS.png" alt="Atrás"/>
-            <div>
-              <label>Foto 4 – Atrás</label>
-              <input type="file" accept="image/*" name="foto4">
-            </div>
-          </div>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Firmas</legend>
-        <div class="grid g2">
-          <div>
-            <label>Entrega</label>
-            <canvas width="320" height="120" class="sig" id="sigEntrega"></canvas>
-            <div class="actions"><button class="secondary" type="button" data-clear="sigEntrega">Limpiar</button></div>
-          </div>
-          <div>
-            <label>Recibe</label>
-            <canvas width="320" height="120" class="sig" id="sigRecibe"></canvas>
-            <div class="actions"><button class="secondary" type="button" data-clear="sigRecibe">Limpiar</button></div>
-          </div>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Observaciones</legend>
-        <textarea name="obs" placeholder="Observaciones relevantes…"></textarea>
-        <div class="help">La empresa no se hace responsable de artículos personales que dejen dentro de la unidad.</div>
-      </fieldset>
-      <div class="actions">
-        <button id="btnPDF" type="button">Generar PDF</button>
-        <span class="help" id="status"></span>
-      </div>
-    </form>
-  </main>
+  </div>
+
+  <div>
+    <label>Recibe</label>
+    <canvas width="320" height="120" class="sig" id="sigRecibe"></canvas>
+    <div class="actions">
+      <button class="secondary" type="button" data-clear="sigRecibe">Limpiar</button>
+    </div>
+  </div>
+</div>
+</fieldset>
+
+<!-- OBSERVACIONES -->
+<fieldset>
+<legend>Observaciones</legend>
+<textarea name="obs" placeholder="Observaciones relevantes…"></textarea>
+<div class="help">La empresa no se hace responsable de artículos personales que dejen dentro de la unidad.</div>
+</fieldset>
+
+<!-- ACCIONES -->
+<div class="actions">
+  <button id="btnPDF" type="button">Generar PDF</button>
+  <span class="help" id="status"></span>
+</div>
+
+</form>
+</main>
+
 <script>
-(function(){
-  async function ensureJsPDF(){
-    if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
-    await new Promise((resolve, reject)=>{
-      const s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-      s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
-    });
-    if (!(window.jspdf && window.jspdf.jsPDF)) throw new Error('jsPDF no disponible');
-    return window.jspdf.jsPDF;
-  }
-  const WHATSAPP_DEST = '529935132288';
-  const EMAIL_DEST = 'j.a.l.h@outlook.com';
-  const interno = ['Palanca direccional','Botón intermitentes','Emblema volante','Perilla de palanca','Tapón de la perilla','Palanca freno de mano','Bocinas','Estéreo','Pantallas','Video','Extintor','Llanta de refacción','Gato hidráulico','Llave de rueda'];
-  const externo = ['Tapón de aceite','Tapón de combustible','Tapón dep. agua','Antena','Logo trasero','Logo delantero','Tarjeta de circulación','Póliza de seguro','Claxon','Tarjeta IAVE o Televía'];
-  function renderYNTable(tblId, arr, prefix){
-    const tb=document.querySelector('#'+tblId+' tbody');
-    arr.forEach((l,i)=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML = '<td>'+l+'</td>'+
-        "<td style=\"text-align:center\"><input type=\"radio\" name=\""+prefix+"_"+i+"\" value=\"Sí\"></td>"+
-        "<td style=\"text-align:center\"><input type=\"radio\" name=\""+prefix+"_"+i+"\" value=\"No\"></td>";
-      tb.appendChild(tr);
-    });
-  }
-  function enableSig(id){
-    const c=document.getElementById(id),x=c.getContext('2d');let d=false,l=null;
-    const r=e=>{const b=c.getBoundingClientRect();return {x:(e.touches?e.touches[0].clientX:e.clientX)-b.left,y:(e.touches?e.touches[0].clientY:e.clientY)-b.top};};
-    const s=e=>{d=true;l=r(e);e.preventDefault();};
-    const m=e=>{if(!d)return;const p=r(e);x.beginPath();x.moveTo(l.x,l.y);x.lineTo(p.x,p.y);x.lineWidth=2;x.strokeStyle='#111';x.lineCap='round';x.stroke();l=p;e.preventDefault();};
-    const e0=()=>{d=false;};
-    c.addEventListener('mousedown',s);c.addEventListener('mousemove',m);window.addEventListener('mouseup',e0);
-    c.addEventListener('touchstart',s,{passive:false});c.addEventListener('touchmove',m,{passive:false});c.addEventListener('touchend',e0);
-    document.querySelector('[data-clear="'+id+'"]').addEventListener('click',()=>x.clearRect(0,0,c.width,c.height));
-    return ()=>c.toDataURL('image/png');
-  }
-  function fileToDataURL(f){return new Promise(res=>{if(!f){res(null);return;}const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(f);});}
-  function collect(){
-    const f=document.getElementById('frmInv');
-    const fd=new FormData(f);
-    const d=Object.fromEntries(fd.entries());
-    d.interno = interno.map((l,i)=>({label:l,val:fd.get('int_'+i)||''}));
-    d.externo = externo.map((l,i)=>({label:l,val:fd.get('ext_'+i)||''}));
-    d.sigEntrega = getSigEntrega();
-    d.sigRecibe = getSigRecibe();
-    return d;
-  }
-  async function generarPDF(statusEl){
-    const jsPDF = await ensureJsPDF();
-    const data = collect();
-    if(!/^\d{7}$/.test((data.empleado||'').trim())){
-      alert('La clave de empleado debe tener exactamente 7 dígitos.');
-      throw new Error('Empleado inválido');
-    }
-    const [f1,f2,f3,f4] = await Promise.all([
-      fileToDataURL(document.querySelector('input[name="foto1"]').files[0]),
-      fileToDataURL(document.querySelector('input[name="foto2"]').files[0]),
-      fileToDataURL(document.querySelector('input[name="foto3"]').files[0]),
-      fileToDataURL(document.querySelector('input[name="foto4"]').files[0])
-    ]);
-    const doc=new jsPDF({unit:'pt',format:'a4'});const W=doc.internal.pageSize.getWidth();const M=36;let y=M;
-    // Logo si existe
-    const logoImg = document.querySelector('header img');
-    if (logoImg && logoImg.complete) {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = logoImg.naturalWidth; canvas.height = logoImg.naturalHeight;
-        const ctx = canvas.getContext('2d'); ctx.drawImage(logoImg,0,0);
-        const logoData = canvas.toDataURL('image/png');
-        doc.addImage(logoData,'PNG',M,y-10,80,28);
-      } catch(e) {}
-    }
-    doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text('INVENTARIO DIARIO DE UNIDAD TORETO', W/2, y, {align:'center'});y+=20;
-    doc.setFont('helvetica','normal');doc.setFontSize(10);
-    const L=(t,v,x)=>doc.text(`${t}: ${v||'-'}`, x, y);
-    L('Fecha', data.fecha, M);L('Unidad', data.unidad, M+200);L('Ciudad', data.ciudad, M+380);y+=16;L('Terminal', data.terminal, M);L('Lugar de estancia', data.lugar, M+260);y+=22;
-    doc.setFont('helvetica','bold');doc.text('Inventario interno',M,y);doc.setFont('helvetica','normal');y+=10;const y0=y;
-    data.interno.forEach(it=>{doc.text(`${it.label}: ${it.val||'—'}`, M, y);y+=14;});
-    let rY=y0;doc.setFont('helvetica','bold');doc.text('Inventario externo', W/2, y0);doc.setFont('helvetica','normal');
-    data.externo.forEach(it=>{doc.text(`${it.label}: ${it.val||'—'}`, W/2, rY+10);rY+=14;}); y=Math.max(y,rY)+14;
-    doc.setFont('helvetica','bold');doc.text('Fotos', M, y);y+=6;const imgW=(W-M*2-16)/2, imgH=120;const add=(img,x,y,l)=>{doc.setDrawColor(200);doc.rect(x,y,imgW,imgH);if(img){doc.addImage(img,'JPEG',x+2,y+2,imgW-4,imgH-4);}doc.setFontSize(9);doc.setFont('helvetica','italic');doc.text(l,x+4,y+imgH+12);doc.setFontSize(10);doc.setFont('helvetica','normal');};
-    add(f1,M,y+8,'Foto 1 – Lado Izq.');add(f2,M+imgW+16,y+8,'Foto 2 – Lado Der.');add(f3,M,y+imgH+42,'Foto 3 – Frente');add(f4,M+imgW+16,y+imgH+42,'Foto 4 – Atrás');y+=imgH*2+70; if(y>700){doc.addPage(); y=M;}
-    doc.setFont('helvetica','bold');doc.text('Observaciones',M,y);y+=12;doc.setFont('helvetica','normal');const obs=(data.obs||'').trim()||'—';const lines=doc.splitTextToSize(obs, W-M*2);doc.text(lines,M,y);y+=Math.max(60,lines.length*12)+10;
-    doc.setFont('helvetica','bold');doc.text('Firmas',M,y);y+=8;const fw=(W-M*2-40)/2, fh=80;doc.setDrawColor(180);if(data.sigEntrega){doc.addImage(data.sigEntrega,'PNG',M,y,fw,fh);}if(data.sigRecibe){doc.addImage(data.sigRecibe,'PNG',M+fw+40,y,fw,fh);}doc.line(M,y+fh+6,M+fw,y+fh+6);doc.text('Entrega',M,y+fh+18);doc.line(M+fw+40,y+fh+6,M+fw+40+fw,y+fh+6);doc.text('Recibe',M+fw+40,y+fh+18);y+=fh+28;
-    doc.setFontSize(9);doc.text('NOTA: La empresa no se hace responsable de artículos personales que dejen dentro de la unidad.',M,y);
-    const fecha=(data.fecha||new Date().toISOString().slice(0,10));const filename=`Inventario_Toreto_${data.empleado}_${fecha}.pdf`;
-    const blob=doc.output('blob');
-    const base64=doc.output('datauristring').split(',')[1];
-    return { blob, base64, filename, data };
-  }
-  function downloadBlob(blob, filename){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);} 
-  function openShare(data, filename){const texto=encodeURIComponent(`Inventario de Unidad Toreto\nEmpleado: ${data.empleado}\nFecha: ${data.fecha}\nUnidad: ${data.unidad||'-'}\n*Se adjunta el PDF (${filename}).*`);window.open(`https://wa.me/529935132288?text=${texto}`,'_blank');const subject=encodeURIComponent(`Inventario Unidad Toreto – ${data.empleado} – ${data.fecha}`);const body=encodeURIComponent(`Hola,\n\nSe adjunta el PDF "${filename}" del inventario.\n\n(Nota: si no se adjuntó automáticamente, por favor adjúntalo al correo que se descargó)\n\nGracias.`);window.location.href=`mailto:j.a.l.h@outlook.com?subject=${subject}&body=${body}`;}
+/* ================================
+   UTILIDADES GENERALES
+================================ */
+function clearCanvas(id){
+  const c = document.getElementById(id);
+  if(!c) return;
+  const x = c.getContext('2d');
+  x.clearRect(0,0,c.width,c.height);
+}
 
-  // --- NUEVO: enviar PDF al backend para adjuntarlo en el correo ---
-  async function enviarPorCorreo(pdfBlob, filename, emailDestino = 'j.a.l.h@outlook.com') {
-    const formData = new FormData();
-    formData.append('pdf', pdfBlob, filename);
-    formData.append('to', emailDestino);
-    formData.append('subject', `Inventario Unidad Toreto – ${filename}`);
-    formData.append('body', `Hola,\n\nAdjunto el PDF "${filename}" generado desde la app web.\n\nSaludos.`);
+function resetForm(){
+  const f = document.getElementById('frmInv');
+  if(!f) return;
 
-    const resp = await fetch('/api/send-email', { method: 'POST', body: formData });
-    if (!resp.ok) {
-      const txt = await resp.text().catch(()=> '');
-      throw new Error(`Error al enviar correo (${resp.status}). ${txt}`);
-    }
-    return await resp.json().catch(()=>({}));
-  }
+  f.reset();
 
-  
- // --- LIMPIEZA DEL FORMULARIO DESPUÉS DE GENERAR PDF ---
- function clearCanvas(id){
-   const c = document.getElementById(id); if(!c) return; const x=c.getContext('2d'); x.clearRect(0,0,c.width,c.height);
- }
- function resetForm(){
-   const f = document.getElementById('frmInv'); if(!f) return; f.reset();
-   // restaurar valores por defecto
-   const fecha = document.getElementById('fecha'); if (fecha) fecha.value = new Date().toISOString().slice(0,10);
-   const ciudad = document.getElementById('ciudad'); if (ciudad) ciudad.value = 'VILLAHERMOSA, TABASCO';
-   // limpiar firmas y ayudas
-   clearCanvas('sigEntrega'); clearCanvas('sigRecibe');
-   const help = document.getElementById('empleadoHelp'); if (help) { help.textContent=''; help.removeAttribute('style'); }
-   const status = document.getElementById('status'); if (status) status.textContent='';
-   // limpiar inputs de archivo manualmente por compatibilidad
-   ['foto1','foto2','foto3','foto4'].forEach(n=>{ const el = document.querySelector(`input[name="${n}"]`); if(el) el.value=''; });
- }
-document.addEventListener('DOMContentLoaded', ()=>{
-    document.getElementById('fecha').value = new Date().toISOString().slice(0,10);
-    const ciudad = document.getElementById('ciudad'); if (ciudad) ciudad.value = 'VILLAHERMOSA, TABASCO';
-    renderYNTable('tblInterno', interno, 'int');
-    renderYNTable('tblExterno', externo, 'ext');
-    window.getSigEntrega = enableSig('sigEntrega');
-    window.getSigRecibe = enableSig('sigRecibe');
-    const empleado=document.getElementById('empleado');
-    const help=document.getElementById('empleadoHelp');
-    empleado.addEventListener('input',()=>{const ok=/^\d{7}$/.test(empleado.value.trim());help.textContent= ok?'Formato correcto.':'Debe ser exactamente 7 dígitos.';help.style.color= ok?'#1b5e20':'#b71c1c';});
-    const status=document.getElementById('status');
-    const btnPDF=document.getElementById('btnPDF');
-    async function withBusy(btn, fn){
-      try{ btn.disabled=true; status.textContent='Procesando…'; await fn(); status.textContent='Listo.'; }
-      catch(e){ console.error(e); status.textContent=(e&&e.message)||'Error.'; alert(status.textContent); }
-      finally{ btn.disabled=false; }
-    }
+  document.getElementById('fecha').value = new Date().toISOString().slice(0,10);
+  document.getElementById('ciudad').value = 'VILLAHERMOSA, TABASCO';
 
-    // --- MODIFICADO: Generar PDF + enviar por correo automáticamente ---
-    btnPDF.addEventListener('click', ()=> withBusy(btnPDF, async()=>{
-      const {blob, filename} = await generarPDF(status);
-      downloadBlob(blob, filename);
-      await enviarPorCorreo(blob, filename, 'j.a.l.h@outlook.com');
-      status.textContent = 'PDF generado y enviado por correo.';
-    }));
+  clearCanvas('sigEntrega');
+  clearCanvas('sigRecibe');
+
+  const help = document.getElementById('empleadoHelp');
+  if(help){ help.textContent=''; help.removeAttribute('style'); }
+
+  const status = document.getElementById('status');
+  if(status) status.textContent='';
+
+  ['foto1','foto2','foto3','foto4'].forEach(n=>{
+    const f = document.querySelector(`input[name="${n}"]`);
+    if(f) f.value='';
   });
-})();
+}
+
+async function withBusy(btn, fn, finallyHook){
+  try{
+    btn.disabled = true;
+    status.textContent = 'Procesando…';
+    await fn();
+    status.textContent = 'Listo.';
+  }
+  catch(e){
+    status.textContent = e.message || 'Error.';
+    alert(status.textContent);
+  }
+  finally{
+    btn.disabled = false;
+    if(typeof finallyHook === "function") finallyHook();
+  }
+}
+
+/* ================================
+   INVENTARIOS
+================================ */
+const interno = [
+  'Palanca direccional','Botón intermitentes','Emblema volante','Perilla de palanca',
+  'Tapón de la perilla','Palanca freno de mano','Bocinas','Estéreo','Pantallas',
+  'Video','Extintor','Llanta de refacción','Gato hidráulico','Llave de rueda'
+];
+
+const externo = [
+  'Tapón de aceite','Tapón de combustible','Tapón dep. agua','Antena','Logo trasero',
+  'Logo delantero','Tarjeta de circulación','Póliza de seguro','Claxon','Tarjeta IAVE o Televía'
+];
+
+function renderYNTable(tbl, arr, pref){
+  const tb = document.querySelector(`#${tbl} tbody`);
+  arr.forEach((txt, i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${txt}</td>
+      <td style="text-align:center"><input type="radio" name="${pref}_${i}" value="Sí"></td>
+      <td style="text-align:center"><input type="radio" name="${pref}_${i}" value="No"></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+/* ================================
+   FIRMAS (LÓGICA DE DIBUJO)
+================================ */
+function enableSig(id){
+  const c = document.getElementById(id);
+  const x = c.getContext('2d');
+  let drawing = false, last = null;
+
+  function pos(e){
+    const r = c.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+  }
+  function down(e){
+    drawing = true;
+    last = pos(e);
+    e.preventDefault();
+  }
+  function move(e){
+    if(!drawing) return;
+    const p = pos(e);
+    x.beginPath();
+    x.moveTo(last.x, last.y);
+    x.lineTo(p.x, p.y);
+    x.lineWidth = 2;
+    x.strokeStyle = "#111";
+    x.lineCap = "round";
+    x.stroke();
+    last = p;
+    e.preventDefault();
+  }
+  function up(){ drawing = false }
+
+  c.addEventListener("mousedown", down);
+  c.addEventListener("mousemove", move);
+  window.addEventListener("mouseup", up);
+
+  c.addEventListener("touchstart", down, {passive:false});
+  c.addEventListener("touchmove", move, {passive:false});
+  c.addEventListener("touchend", up);
+
+  document.querySelector(`[data-clear="${id}"]`)
+    .addEventListener("click", ()=> clearCanvas(id));
+
+  return ()=> c.toDataURL("image/png");
+}
+
+/* ================================
+   FOTOS → Base64
+================================ */
+function fileToDataURL(f){
+  return new Promise(res=>{
+    if(!f){ res(null); return; }
+    const fr = new FileReader();
+    fr.onload = ()=> res(fr.result);
+    fr.readAsDataURL(f);
+  });
+}
+
+/* ================================
+   MARCA DE AGUA A PANTALLA COMPLETA
+================================ */
+function getLogoData(){
+  const img = document.querySelector("header img");
+  if(!img || !img.complete) return null;
+
+  const cv = document.createElement("canvas");
+  cv.width = img.naturalWidth;
+  cv.height = img.naturalHeight;
+  const cx = cv.getContext("2d");
+  cx.drawImage(img,0,0);
+  return cv.toDataURL("image/png");
+}
+
+function addWatermark(doc){
+  const logo = getLogoData();
+  if(!logo) return;
+
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+
+  const w = W * 0.85;  
+  const h = H * 0.85;
+
+  const x = (W - w) / 2;
+  const y = (H - h) / 2;
+
+  try{
+    const gs = doc.GState ? new doc.GState({ opacity:0.08 }) : null;
+    if(gs && doc.setGState) doc.setGState(gs);
+    doc.addImage(logo, "PNG", x, y, w, h);
+    if(gs && doc.setGState) doc.setGState(new doc.GState({ opacity:1 }));
+  }
+  catch(e){
+    doc.addImage(logo, "PNG", x, y, w, h);
+  }
+}
+
+/* ================================
+   GENERAR PDF
+================================ */
+async function generarPDF(){
+  const jsPDF = window.jspdf.jsPDF;
+
+  const frm = new FormData(document.getElementById("frmInv"));
+  const data = Object.fromEntries(frm.entries());
+
+  data.interno = interno.map((txt,i)=> ({
+    label:txt,
+    val: frm.get(`int_${i}`) || "—"
+  }));
+
+  data.externo = externo.map((txt,i)=> ({
+    label:txt,
+    val: frm.get(`ext_${i}`) || "—"
+  }));
+
+  data.sigEntrega = getSigEntrega();
+  data.sigRecibe  = getSigRecibe();
+
+  const fotos = await Promise.all([
+    fileToDataURL(document.querySelector('input[name="foto1"]').files[0]),
+    fileToDataURL(document.querySelector('input[name="foto2"]').files[0]),
+    fileToDataURL(document.querySelector('input[name="foto3"]').files[0]),
+    fileToDataURL(document.querySelector('input[name="foto4"]').files[0])
+  ]);
+
+  const doc = new jsPDF({unit:"pt", format:"a4"});
+  addWatermark(doc); // MARCA DE AGUA A PÁGINA COMPLETA
+
+  const W = doc.internal.pageSize.getWidth();
+  const M = 36;
+  let y = M;
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(14);
+  doc.text("INVENTARIO DIARIO DE UNIDAD TORETO", W/2, y, {align:"center"});
+  y += 20;
+
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(10);
+
+  const L = (t,v,x)=> doc.text(`${t}: ${v||"-"}`, x, y);
+
+  L("Fecha", data.fecha, M);
+  L("Unidad", data.unidad, M+200);
+  L("Ciudad", data.ciudad, M+380);
+  y += 16;
+
+  L("Terminal", data.terminal, M);
+  L("Lugar de estancia", data.lugar, M+260);
+  y += 22;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Inventario interno", M, y);
+  y += 10;
+
+  doc.setFont("helvetica","normal");
+  data.interno.forEach(it=>{
+    doc.text(`${it.label}: ${it.val}`, M, y);
+    y += 14;
+  });
+
+  let y2 = M;
+  doc.setFont("helvetica","bold");
+  doc.text("Inventario externo", W/2, y2);
+  y2 += 10;
+
+  doc.setFont("helvetica","normal");
+  data.externo.forEach(it=>{
+    doc.text(`${it.label}: ${it.val}`, W/2, y2);
+    y2 += 14;
+  });
+
+  y = Math.max(y, y2) + 20;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Fotos", M, y);
+  y += 6;
+
+  const imgW = (W - M*2 - 16)/2;
+  const imgH = 120;
+
+  function addImg(img, x, y, lbl){
+    doc.setDrawColor(200);
+    doc.rect(x, y, imgW, imgH);
+    if(img){
+      doc.addImage(img, "JPEG", x+2, y+2, imgW-4, imgH-4);
+    }
+    doc.setFont("helvetica","italic");
+    doc.setFontSize(9);
+    doc.text(lbl, x+4, y+imgH+12);
+    doc.setFontSize(10);
+    doc.setFont("helvetica","normal");
+  }
+
+  addImg(fotos[0], M, y+8, "Foto 1 – Lado Izq.");
+  addImg(fotos[1], M+imgW+16, y+8, "Foto 2 – Lado Der.");
+  addImg(fotos[2], M, y+imgH+42, "Foto 3 – Frente");
+  addImg(fotos[3], M+imgW+16, y+imgH+42, "Foto 4 – Atrás");
+
+  y += imgH*2 + 70;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Observaciones", M, y);
+  y += 12;
+
+  const obsLines = doc.splitTextToSize(data.obs||"—", W-M*2);
+  doc.setFont("helvetica","normal");
+  doc.text(obsLines, M, y);
+
+  y += Math.max(60, obsLines.length*12) + 10;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Firmas", M, y);
+  y += 8;
+
+  const fw = (W - M*2 - 40)/2;
+  const fh = 80;
+
+  if(data.sigEntrega)
+    doc.addImage(data.sigEntrega,"PNG", M, y, fw, fh);
+  if(data.sigRecibe)
+    doc.addImage(data.sigRecibe,"PNG", M+fw+40, y, fw, fh);
+
+  doc.line(M, y+fh+6, M+fw, y+fh+6);
+  doc.text("Entrega", M, y+fh+18);
+
+  doc.line(M+fw+40, y+fh+6, M+fw+40+fw, y+fh+6);
+  doc.text("Recibe", M+fw+40, y+fh+18);
+
+  y += fh + 28;
+
+  doc.setFontSize(9);
+  doc.text(
+    "NOTA: La empresa no se hace responsable de artículos personales que dejen dentro de la unidad.",
+    M,
+    y
+  );
+
+  const fecha = data.fecha || new Date().toISOString().slice(0,10);
+  const filename = `Inventario_Toreto_${data.empleado}_${fecha}.pdf`;
+
+  return { doc, filename };
+}
+
+/* ================================
+   EVENTOS
+================================ */
+document.addEventListener("DOMContentLoaded", ()=>{
+  document.getElementById("fecha").value = new Date().toISOString().slice(0,10);
+
+  renderYNTable("tblInterno", interno, "int");
+  renderYNTable("tblExterno", externo, "ext");
+
+  window.getSigEntrega = enableSig("sigEntrega");
+  window.getSigRecibe  = enableSig("sigRecibe");
+
+  const empleado = document.getElementById("empleado");
+  const help = document.getElementById("empleadoHelp");
+
+  empleado.addEventListener("input", ()=>{
+    const ok = /^\d{7}$/.test(empleado.value.trim());
+    help.textContent = ok ? "Formato correcto." : "Debe ser exactamente 7 dígitos.";
+    help.style.color = ok ? "#1b5e20" : "#b71c1c";
+  });
+
+  const btnPDF = document.getElementById("btnPDF");
+  window.status = document.getElementById("status");
+
+  btnPDF.addEventListener("click", ()=> 
+    withBusy(btnPDF, async()=>{
+      const {doc, filename} = await generarPDF();
+      doc.save(filename);
+    }, resetForm)
+  );
+});
 </script>
+
 </body>
 </html>
