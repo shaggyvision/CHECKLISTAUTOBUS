@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Inventario Diario de Unidad SPRINTER — Móvil (Oficio, sin enviar)</title>
+  <title>Inventario Diario de Unidad SPRINTER — Móvil (Oficio, con cámara)</title>
   <style>
     :root{
       --c1:#0d47a1; --bg:#f5f7fb; --ink:#222; --muted:#607d8b;
@@ -33,7 +33,7 @@
     textarea{min-height:110px; resize:vertical}
     .tbl{width:100%; border-collapse:collapse; font-size:.95rem}
     .tbl th,.tbl td{border:1px solid var(--bd); padding:10px}
-    .tbl th{background:#f0f4ff; color:var(--c1); text-align:left}
+    .tbl th{background:#f0f4ff; color:#0d47a1; text-align:left}
     .tbl td input[type="radio"]{transform:scale(1.3); accent-color:var(--c1)}
     @media (max-width: 576px){ .tbl thead{display:none} .tbl tr{display:grid; grid-template-columns:1fr auto auto; align-items:center} .tbl td, .tbl th{border-width:0 0 1px 0} .tbl td:first-child{padding-left:0; font-weight:600} .tbl td:nth-child(2), .tbl td:nth-child(3){justify-self:end} }
     .photo-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
@@ -57,7 +57,7 @@
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'"/>
       <div>
         <div class="t">Inventario Diario de Unidad SPRINTER</div>
-        <div class="help">Genera PDF (tamaño oficio)</div>
+        <div class="help">Genera PDF (tamaño oficio). Toca las casillas de foto para usar la cámara.</div>
       </div>
     </header>
     <main>
@@ -111,28 +111,32 @@
                 <img class="bus" src="IZQUIERDA.png" alt="Lado Izquierdo"/>
                 <div>
                   <label>Foto 1 – Lado Izquierdo</label>
-                  <input type="file" accept="image/*" name="foto1">
+                  <input type="file" accept="image/*" capture="environment" name="foto1">
+                  <div class="help">Preferente: cámara trasera.</div>
                 </div>
               </div>
               <div class="photo-item">
                 <img class="bus" src="DERECHA.png" alt="Lado Derecho"/>
                 <div>
                   <label>Foto 2 – Lado Derecho</label>
-                  <input type="file" accept="image/*" name="foto2">
+                  <input type="file" accept="image/*" capture="environment" name="foto2">
+                  <div class="help">Preferente: cámara trasera.</div>
                 </div>
               </div>
               <div class="photo-item">
                 <img class="bus" src="FRENTE.png" alt="Frente"/>
                 <div>
                   <label>Foto 3 – Frente</label>
-                  <input type="file" accept="image/*" name="foto3">
+                  <input type="file" accept="image/*" capture="environment" name="foto3">
+                  <div class="help">Preferente: cámara trasera.</div>
                 </div>
               </div>
               <div class="photo-item">
                 <img class="bus" src="ATRAS.png" alt="Atrás"/>
                 <div>
                   <label>Foto 4 – Atrás</label>
-                  <input type="file" accept="image/*" name="foto4">
+                  <input type="file" accept="image/*" capture="environment" name="foto4">
+                  <div class="help">Preferente: cámara trasera.</div>
                 </div>
               </div>
             </div>
@@ -169,7 +173,6 @@
       </div>
     </main>
   </div>
-
 <script>
 (function(){
   async function ensureJsPDF(){
@@ -181,34 +184,34 @@
   const interno = ['Palanca direccional','Botón intermitentes','Emblema volante','Perilla de palanca','Tapón de la perilla','Palanca freno de mano','Bocinas','Estéreo','Pantallas','Video','Extintor','Llanta de refacción','Gato hidráulico','Llave de rueda'];
   const externo = ['Tapón de aceite','Tapón de combustible','Tapón dep. agua','Antena','Logo trasero','Logo delantero','Tarjeta de circulación','Póliza de seguro','Claxon','Tarjeta IAVE o Televía'];
   function renderYNTable(tblId, arr, prefix){
-  const tb = document.querySelector('#'+tblId+' tbody');
-  tb.innerHTML = '';
-  arr.forEach((label,i)=>{
-    const tr = document.createElement('tr');
-    const tdLabel = document.createElement('td');
-    tdLabel.textContent = label;
-    if (label.toLowerCase() === 'bocinas'){
-      const box = document.createElement('div');
-      box.style.marginTop='6px'; box.style.display='none'; box.id='bocinasBox_'+i;
-      const inp = document.createElement('input');
-      inp.type='number'; inp.name='bocinas_numero'; inp.min='1'; inp.inputMode='numeric';
-      inp.placeholder='Número de bocinas (>0)'; inp.style.width='100%';
-      box.appendChild(inp); tdLabel.appendChild(box);
-    }
-    const tdSi = document.createElement('td'); tdSi.style.textAlign='center';
-    const rSi = document.createElement('input'); rSi.type='radio'; rSi.name=prefix+'_'+i; rSi.value='Sí';
-    tdSi.appendChild(rSi);
-    const tdNo = document.createElement('td'); tdNo.style.textAlign='center';
-    const rNo = document.createElement('input'); rNo.type='radio'; rNo.name=prefix+'_'+i; rNo.value='No';
-    tdNo.appendChild(rNo);
-    tr.appendChild(tdLabel); tr.appendChild(tdSi); tr.appendChild(tdNo); tb.appendChild(tr);
-    if (label.toLowerCase() === 'bocinas'){
-      const box = document.getElementById('bocinasBox_'+i); const input = box.querySelector('input');
-      const update = ()=>{ if (rSi.checked){ box.style.display='block'; input.focus(); } else { box.style.display='none'; input.value=''; } };
-      rSi.addEventListener('change', update); rNo.addEventListener('change', update);
-    }
-  });
-}
+    const tb = document.querySelector('#'+tblId+' tbody');
+    tb.innerHTML = '';
+    arr.forEach((label,i)=>{
+      const tr = document.createElement('tr');
+      const tdLabel = document.createElement('td');
+      tdLabel.textContent = label;
+      if (label.toLowerCase() === 'bocinas'){
+        const box = document.createElement('div');
+        box.style.marginTop='6px'; box.style.display='none'; box.id='bocinasBox_'+i;
+        const inp = document.createElement('input');
+        inp.type='number'; inp.name='bocinas_numero'; inp.min='1'; inp.inputMode='numeric';
+        inp.placeholder='Número de bocinas (>0)'; inp.style.width='100%';
+        box.appendChild(inp); tdLabel.appendChild(box);
+      }
+      const tdSi = document.createElement('td'); tdSi.style.textAlign='center';
+      const rSi = document.createElement('input'); rSi.type='radio'; rSi.name=prefix+'_'+i; rSi.value='Sí';
+      tdSi.appendChild(rSi);
+      const tdNo = document.createElement('td'); tdNo.style.textAlign='center';
+      const rNo = document.createElement('input'); rNo.type='radio'; rNo.name=prefix+'_'+i; rNo.value='No';
+      tdNo.appendChild(rNo);
+      tr.appendChild(tdLabel); tr.appendChild(tdSi); tr.appendChild(tdNo); tb.appendChild(tr);
+      if (label.toLowerCase() === 'bocinas'){
+        const box = document.getElementById('bocinasBox_'+i); const input = box.querySelector('input');
+        const update = ()=>{ if (rSi.checked){ box.style.display='block'; input.focus(); } else { box.style.display='none'; input.value=''; } };
+        rSi.addEventListener('change', update); rNo.addEventListener('change', update);
+      }
+    });
+ }
   function enableSig(id){
     const c=document.getElementById(id),x=c.getContext('2d');let d=false,l=null;
     const r=e=>{const b=c.getBoundingClientRect();return {x:(e.touches?e.touches[0].clientX:e.clientX)-b.left,y:(e.touches?e.touches[0].clientY:e.clientY)-b.top};};
@@ -238,17 +241,16 @@
       alert('La clave de empleado debe tener exactamente 7 dígitos.');
       throw new Error('Empleado inválido');
     }
-  // Validación: si Bocinas es 'Sí', exigir número entero > 0
-  const bocinasItem = data.interno && data.interno.find(i => i.label === 'Bocinas');
-  if (bocinasItem && bocinasItem.val === 'Sí') {
-    const raw = (data.bocinas_numero || '').toString().trim();
-    const num = parseInt(raw, 10);
-    if (!raw || !Number.isFinite(num) || num <= 0) {
-      alert('No puso el número de bocinas');
-      throw new Error('Número de bocinas requerido (> 0)');
+    // Validación: si Bocinas es 'Sí', exigir número entero > 0
+    const bocinasItem = data.interno && data.interno.find(i => i.label === 'Bocinas');
+    if (bocinasItem && bocinasItem.val === 'Sí') {
+      const raw = (data.bocinas_numero || '').toString().trim();
+      const num = parseInt(raw, 10);
+      if (!raw || !Number.isFinite(num) || num <= 0) {
+        alert('No puso el número de bocinas');
+        throw new Error('Número de bocinas requerido (> 0)');
+      }
     }
-  }
-
     const [f1,f2,f3,f4] = await Promise.all([
       fileToDataURL(document.querySelector('input[name="foto1"]').files[0]),
       fileToDataURL(document.querySelector('input[name="foto2"]').files[0]),
@@ -292,7 +294,6 @@
     return { blob, filename };
   }
   function downloadBlob(blob, filename){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
-
   document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('fecha').value = new Date().toISOString().slice(0,10);
     const ciudad = document.getElementById('ciudad'); if (ciudad) ciudad.value = 'VILLAHERMOSA, TABASCO';
@@ -303,7 +304,6 @@
     const empleado=document.getElementById('empleado');
     const help=document.getElementById('empleadoHelp');
     empleado.addEventListener('input',()=>{const ok=/^\d{7}$/.test(empleado.value.trim());help.textContent= ok?'Formato correcto.':'Debe ser exactamente 7 dígitos.';help.style.color= ok?'#1b5e20':'#b71c1c';});
-
     const status=document.getElementById('status');
     const btnPDF=document.getElementById('btnPDF');
     async function withBusy(btn, fn){
