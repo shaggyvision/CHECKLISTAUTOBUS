@@ -181,15 +181,43 @@
   const interno = ['Palanca direccional','Botón intermitentes','Emblema volante','Perilla de palanca','Tapón de la perilla','Palanca freno de mano','Bocinas','Estéreo','Pantallas','Video','Extintor','Llanta de refacción','Gato hidráulico','Llave de rueda'];
   const externo = ['Tapón de aceite','Tapón de combustible','Tapón dep. agua','Antena','Logo trasero','Logo delantero','Tarjeta de circulación','Póliza de seguro','Claxon','Tarjeta IAVE o Televía'];
   function renderYNTable(tblId, arr, prefix){
-    const tb=document.querySelector('#'+tblId+' tbody');
-    arr.forEach((l,i)=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML = '<td>'+l+'</td>'+
-        "<td style=\"text-align:center\"><input type=\"radio\" name=\""+prefix+"_"+i+"\" value=\"Sí\"></td>"+
-        "<td style=\"text-align:center\"><input type=\"radio\" name=\""+prefix+"_"+i+"\" value=\"No\"></td>";
-      tb.appendChild(tr);
-    });
-  }
+  const tb = document.querySelector('#'+tblId+' tbody');
+  tb.innerHTML = '';
+  arr.forEach((label,i)=>{
+    const tr = document.createElement('tr');
+    const tdLabel = document.createElement('td');
+    tdLabel.textContent = label;
+    if (label.toLowerCase() === 'bocinas'){
+      const box = document.createElement('div');
+      box.style.marginTop = '6px';
+      box.style.display = 'none';
+      box.id = 'bocinasBox_'+i;
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.name = 'bocinas_numero';
+      inp.min = '1';
+      inp.placeholder = 'Número de bocinas';
+      inp.style.width = '100%';
+      box.appendChild(inp);
+      tdLabel.appendChild(box);
+    }
+    const tdSi = document.createElement('td'); tdSi.style.textAlign='center';
+    const rSi = document.createElement('input'); rSi.type='radio'; rSi.name=prefix+'_'+i; rSi.value='Sí';
+    tdSi.appendChild(rSi);
+    const tdNo = document.createElement('td'); tdNo.style.textAlign='center';
+    const rNo = document.createElement('input'); rNo.type='radio'; rNo.name=prefix+'_'+i; rNo.value='No';
+    tdNo.appendChild(rNo);
+    tr.appendChild(tdLabel); tr.appendChild(tdSi); tr.appendChild(tdNo);
+    tb.appendChild(tr);
+    if (label.toLowerCase() === 'bocinas'){
+      const box = document.getElementById('bocinasBox_'+i);
+      const input = box.querySelector('input');
+      const update = ()=>{ if (rSi.checked){ box.style.display='block'; input.focus(); } else { box.style.display='none'; input.value=''; } };
+      rSi.addEventListener('change', update);
+      rNo.addEventListener('change', update);
+    }
+  });
+ }
   function enableSig(id){
     const c=document.getElementById(id),x=c.getContext('2d');let d=false,l=null;
     const r=e=>{const b=c.getBoundingClientRect();return {x:(e.touches?e.touches[0].clientX:e.clientX)-b.left,y:(e.touches?e.touches[0].clientY:e.clientY)-b.top};};
@@ -249,7 +277,16 @@
     const L=(t,v,x)=>doc.text(`${t}: ${v||'-'}`, x, y);
     L('Fecha', data.fecha, M);L('Unidad', data.unidad, M+200);L('Placas', data.placas, M+380);y+=16;L('Ciudad', data.ciudad, M);L('Terminal', data.terminal, M+200);y+=22;
     doc.setFont('helvetica','bold');doc.text('Inventario interno',M,y);doc.setFont('helvetica','normal');y+=10;const y0=y;
-    data.interno.forEach(it=>{doc.text(`${it.label}: ${it.val||'—'}`, M, y);y+=14;});
+    data.interno.forEach(it=>{
+  let val = it.val || '—';
+  if (it.label === 'Bocinas' && val === 'Sí'){
+    const n = (data.bocinas_numero||'').toString().trim();
+    if (n) val += ` (${n})`;
+  }
+  doc.text(`${it.label}: ${val}`, M, y);
+  y += 14;
+});
+
     let rY=y0;doc.setFont('helvetica','bold');doc.text('Inventario externo', W/2, y0);doc.setFont('helvetica','normal');
     data.externo.forEach(it=>{doc.text(`${it.label}: ${it.val||'—'}`, W/2, rY+10);rY+=14;}); y=Math.max(y,rY)+14;
     doc.setFont('helvetica','bold');doc.text('Fotos', M, y);y+=6;const imgW=(W-M*2-16)/2, imgH=120;const add=(img,x,y,l)=>{doc.setDrawColor(200);doc.rect(x,y,imgW,imgH);if(img){doc.addImage(img,'JPEG',x+2,y+2,imgW-4,imgH-4);}doc.setFontSize(9);doc.setFont('helvetica','italic');doc.text(l,x+4,y+imgH+12);doc.setFontSize(10);doc.setFont('helvetica','normal');};
