@@ -79,10 +79,6 @@
                 <label>Unidad</label>
                 <input type="text" name="unidad" placeholder="Ej. 1234 o placas">
               </div>
-		<div>
-		<label>Placas</label>
-		<input type="text" name="placas" placeholder="Ej. ABC-123-D" maxlength="10">
-		</div>
               <div>
                 <label>Ciudad</label>
                 <input type="text" name="ciudad" id="ciudad" value="VILLAHERMOSA, TABASCO" readonly>
@@ -90,6 +86,10 @@
               <div>
                 <label>Terminal</label>
                 <select name="terminal"><option value="">Seleccione…</option><option>Terminal Cardenas</option><option>Encierro</option><option>Cata</option><option>TERMINAL ADO</option></select>
+              </div>
+              <div>
+                <label>Lugar de estancia</label>
+                <input type="text" name="lugar" placeholder="Ej. Patio, Base, Taller">
               </div>
             </div>
           </fieldset>
@@ -189,17 +189,11 @@
     tdLabel.textContent = label;
     if (label.toLowerCase() === 'bocinas'){
       const box = document.createElement('div');
-      box.style.marginTop = '6px';
-      box.style.display = 'none';
-      box.id = 'bocinasBox_'+i;
+      box.style.marginTop='6px'; box.style.display='none'; box.id='bocinasBox_'+i;
       const inp = document.createElement('input');
-      inp.type = 'number';
-      inp.name = 'bocinas_numero';
-      inp.min = '1';
-      inp.placeholder = 'Número de bocinas';
-      inp.style.width = '100%';
-      box.appendChild(inp);
-      tdLabel.appendChild(box);
+      inp.type='number'; inp.name='bocinas_numero'; inp.min='1'; inp.inputMode='numeric';
+      inp.placeholder='Número de bocinas (>0)'; inp.style.width='100%';
+      box.appendChild(inp); tdLabel.appendChild(box);
     }
     const tdSi = document.createElement('td'); tdSi.style.textAlign='center';
     const rSi = document.createElement('input'); rSi.type='radio'; rSi.name=prefix+'_'+i; rSi.value='Sí';
@@ -207,17 +201,14 @@
     const tdNo = document.createElement('td'); tdNo.style.textAlign='center';
     const rNo = document.createElement('input'); rNo.type='radio'; rNo.name=prefix+'_'+i; rNo.value='No';
     tdNo.appendChild(rNo);
-    tr.appendChild(tdLabel); tr.appendChild(tdSi); tr.appendChild(tdNo);
-    tb.appendChild(tr);
+    tr.appendChild(tdLabel); tr.appendChild(tdSi); tr.appendChild(tdNo); tb.appendChild(tr);
     if (label.toLowerCase() === 'bocinas'){
-      const box = document.getElementById('bocinasBox_'+i);
-      const input = box.querySelector('input');
+      const box = document.getElementById('bocinasBox_'+i); const input = box.querySelector('input');
       const update = ()=>{ if (rSi.checked){ box.style.display='block'; input.focus(); } else { box.style.display='none'; input.value=''; } };
-      rSi.addEventListener('change', update);
-      rNo.addEventListener('change', update);
+      rSi.addEventListener('change', update); rNo.addEventListener('change', update);
     }
   });
- }
+}
   function enableSig(id){
     const c=document.getElementById(id),x=c.getContext('2d');let d=false,l=null;
     const r=e=>{const b=c.getBoundingClientRect();return {x:(e.touches?e.touches[0].clientX:e.clientX)-b.left,y:(e.touches?e.touches[0].clientY:e.clientY)-b.top};};
@@ -247,6 +238,17 @@
       alert('La clave de empleado debe tener exactamente 7 dígitos.');
       throw new Error('Empleado inválido');
     }
+  // Validación: si Bocinas es 'Sí', exigir número entero > 0
+  const bocinasItem = data.interno && data.interno.find(i => i.label === 'Bocinas');
+  if (bocinasItem && bocinasItem.val === 'Sí') {
+    const raw = (data.bocinas_numero || '').toString().trim();
+    const num = parseInt(raw, 10);
+    if (!raw || !Number.isFinite(num) || num <= 0) {
+      alert('No puso el número de bocinas');
+      throw new Error('Número de bocinas requerido (> 0)');
+    }
+  }
+
     const [f1,f2,f3,f4] = await Promise.all([
       fileToDataURL(document.querySelector('input[name="foto1"]').files[0]),
       fileToDataURL(document.querySelector('input[name="foto2"]').files[0]),
@@ -277,16 +279,7 @@
     const L=(t,v,x)=>doc.text(`${t}: ${v||'-'}`, x, y);
     L('Fecha', data.fecha, M);L('Unidad', data.unidad, M+200);L('Placas', data.placas, M+380);y+=16;L('Ciudad', data.ciudad, M);L('Terminal', data.terminal, M+200);y+=22;
     doc.setFont('helvetica','bold');doc.text('Inventario interno',M,y);doc.setFont('helvetica','normal');y+=10;const y0=y;
-    data.interno.forEach(it=>{
-  let val = it.val || '—';
-  if (it.label === 'Bocinas' && val === 'Sí'){
-    const n = (data.bocinas_numero||'').toString().trim();
-    if (n) val += ` (${n})`;
-  }
-  doc.text(`${it.label}: ${val}`, M, y);
-  y += 14;
-});
-
+    data.interno.forEach(it=>{ let val = it.val||'—'; if(it.label==='Bocinas' && val==='Sí'){ const n=(data.bocinas_numero||'').toString().trim(); if(n) val+=` (${n})`; } doc.text(`${it.label}: ${val}`, M, y); y+=14;});
     let rY=y0;doc.setFont('helvetica','bold');doc.text('Inventario externo', W/2, y0);doc.setFont('helvetica','normal');
     data.externo.forEach(it=>{doc.text(`${it.label}: ${it.val||'—'}`, W/2, rY+10);rY+=14;}); y=Math.max(y,rY)+14;
     doc.setFont('helvetica','bold');doc.text('Fotos', M, y);y+=6;const imgW=(W-M*2-16)/2, imgH=120;const add=(img,x,y,l)=>{doc.setDrawColor(200);doc.rect(x,y,imgW,imgH);if(img){doc.addImage(img,'JPEG',x+2,y+2,imgW-4,imgH-4);}doc.setFontSize(9);doc.setFont('helvetica','italic');doc.text(l,x+4,y+imgH+12);doc.setFontSize(10);doc.setFont('helvetica','normal');};
