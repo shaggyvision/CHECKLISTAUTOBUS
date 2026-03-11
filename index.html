@@ -56,7 +56,7 @@
     <header>
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'"/>
       <div>
-        <div class="t">Inventario Diario de Unidad SPRINTER</div>
+        <div class="t">Inventario Diario de Unidad Toreto</div>
         <div class="help">Genera PDF (tamaño oficio)</div>
       </div>
     </header>
@@ -79,6 +79,10 @@
                 <label>Unidad</label>
                 <input type="text" name="unidad" placeholder="Ej. 1234 o placas">
               </div>
+ 	<div>
+ 	<label>Placas</label>
+ 	<input type="text" name="placas" placeholder="Ej. ABC-123-D" maxlength="10">
+ 	</div>
               <div>
                 <label>Ciudad</label>
                 <input type="text" name="ciudad" id="ciudad" value="VILLAHERMOSA, TABASCO" readonly>
@@ -244,7 +248,7 @@
       } catch(e) {}
     }
     doc.setFont('helvetica','bold');doc.setFontSize(14);
-    doc.text('INVENTARIO DIARIO DE UNIDAD SPRINTER', W/2, y, {align:'center'}); y+=24;
+    doc.text('INVENTARIO DIARIO DE UNIDAD TORETO', W/2, y, {align:'center'}); y+=24;
     doc.setFont('helvetica','normal');doc.setFontSize(10);
     const L=(t,v,x)=>doc.text(`${t}: ${v||'-'}`, x, y);
     L('Fecha', data.fecha, M);L('Unidad', data.unidad, M+200);L('Ciudad', data.ciudad, M+380);y+=16;L('Terminal', data.terminal, M);L('Lugar de estancia', data.lugar, M+260);y+=22;
